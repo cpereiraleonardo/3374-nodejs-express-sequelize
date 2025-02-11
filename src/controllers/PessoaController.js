@@ -16,8 +16,8 @@ class PessoaController extends Controller {
       );
 
       return res.status(200).json(listaMatriculas);
-    } catch (error) {
-      //erro
+    } catch (erro) {
+      return res.status(500).json(erro.message);
     }
   }
 }
