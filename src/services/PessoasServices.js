@@ -1,8 +1,10 @@
+const dataSource = require("../database/models");
 const Services = require("./Services.js");
 
 class PessoaServices extends Services {
   constructor() {
     super("Pessoa");
+    this.matriculaService = new Services("Matricula");
   }
 
   async pegaMatriculasAtivasPorEstudante(id) {
@@ -23,6 +25,21 @@ class PessoaServices extends Services {
     const scope = "todosOsRegistros";
     const listaPessoas = await super.pegaRegistrosPorEscopo(scope);
     return listaPessoas;
+  }
+
+  async cancelaPessoaEMatriculas(estudanteId) {
+    return dataSource.sequelize.transaction(async (transacao) => {
+      await super.atualizaRegistro(
+        { ativo: false },
+        { id: estudanteId },
+        transacao
+      );
+      await this.matriculaService.atualizaRegistro(
+        { status: "cancelado" },
+        { estudante_id: estudanteId },
+        transacao
+      );
+    });
   }
 }
 
